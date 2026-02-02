@@ -132,64 +132,113 @@ const DataManager = {
         // Append timestamp to prevent caching
         const sheetUrlWithCache = googleSheetUrl + '&t=' + new Date().getTime();
 
-        try {
-            // Fetch both sources in parallel
-            const results = await Promise.allSettled([
-                fetch(localUrl).then(res => {
-                    if (!res.ok) throw new Error('Failed to load local file');
-                    return res.text();
-                }),
-                fetch(sheetUrlWithCache).then(res => {
-                    if (!res.ok) throw new Error('Failed to load Google Sheet');
-                    return res.text();
-                })
-            ]);
+        // 1. Check cache and load immediately
+        let isCachedLoaded = false;
+        const cachedData = localStorage.getItem('epata_cached_lessons');
+        
+        if (cachedData) {
+            try {
+                const parsedLessons = JSON.parse(cachedData);
+                if (Array.isArray(parsedLessons) && parsedLessons.length > 0) {
+                    AppState.lessons = parsedLessons;
+                    // Reconstruct playlists from lessons
+                    const playlists = new Set(parsedLessons.map(l => l.playlist));
+                    AppState.playlists = Array.from(playlists).sort();
+                    isCachedLoaded = true;
+                    console.log('Loaded lessons from cache');
+                }
+            } catch (e) {
+                console.error('Error parsing cached lessons:', e);
+            }
+        }
 
-            const lessons = [];
-            const playlists = new Set();
-            let globalIndex = 0;
-            
-            const processCSV = (text) => {
-                const rows = text.trim().split('\n');
-                // Skip header row
-                rows.slice(1).forEach(row => {
-                    const parts = row.split(',').map(f => f.trim());
-                    if (parts.length >= 3) {
-                        const [playlist, title, videoId, pdfLink] = parts;
-                        if (playlist && title) {
-                            playlists.add(playlist);
-                            lessons.push({
-                                id: `lesson_${globalIndex++}`,
-                                playlist,
-                                title,
-                                videoId: videoId?.length === 11 ? videoId : null,
-                                pdfLink: pdfLink && pdfLink !== 'none' ? pdfLink : null,
-                                language: Utils.getLanguage(playlist),
-                                thumbnail: videoId?.length === 11 ? Utils.getYouTubeThumbnail(videoId) : null,
-                                hasNotes: pdfLink && pdfLink !== 'none'
-                            });
+        // 2. Define fetch logic for background update
+        const fetchFreshData = async () => {
+            try {
+                // Fetch both sources in parallel
+                const results = await Promise.allSettled([
+                    fetch(localUrl).then(res => {
+                        if (!res.ok) throw new Error('Failed to load local file');
+                        return res.text();
+                    }),
+                    fetch(sheetUrlWithCache).then(res => {
+                        if (!res.ok) throw new Error('Failed to load Google Sheet');
+                        return res.text();
+                    })
+                ]);
+
+                const lessons = [];
+                const playlists = new Set();
+                let globalIndex = 0;
+                
+                const processCSV = (text) => {
+                    const rows = text.trim().split('\n');
+                    // Skip header row
+                    rows.slice(1).forEach(row => {
+                        const parts = row.split(',').map(f => f.trim());
+                        if (parts.length >= 3) {
+                            const [playlist, title, videoId, pdfLink] = parts;
+                            if (playlist && title) {
+                                playlists.add(playlist);
+                                lessons.push({
+                                    id: `lesson_${globalIndex++}`,
+                                    playlist,
+                                    title,
+                                    videoId: videoId?.length === 11 ? videoId : null,
+                                    pdfLink: pdfLink && pdfLink !== 'none' ? pdfLink : null,
+                                    language: Utils.getLanguage(playlist),
+                                    thumbnail: videoId?.length === 11 ? Utils.getYouTubeThumbnail(videoId) : null,
+                                    hasNotes: pdfLink && pdfLink !== 'none'
+                                });
+                            }
                         }
+                    });
+                };
+                
+                // Process results from both sources
+                results.forEach((result, index) => {
+                    if (result.status === 'fulfilled') {
+                        processCSV(result.value);
+                    } else {
+                        console.warn(`Source ${index === 0 ? 'Local' : 'Google Sheets'} failed:`, result.reason);
                     }
                 });
-            };
-            
-            // Process results from both sources
-            results.forEach((result, index) => {
-                if (result.status === 'fulfilled') {
-                    processCSV(result.value);
-                } else {
-                    console.warn(`Source ${index === 0 ? 'Local' : 'Google Sheets'} failed:`, result.reason);
+
+                if (lessons.length === 0) return false;
+
+                // Check if data differs from current AppState
+                const currentDataStr = JSON.stringify(AppState.lessons);
+                const newDataStr = JSON.stringify(lessons);
+
+                if (currentDataStr !== newDataStr) {
+                    console.log('New data found, updating...');
+                    AppState.lessons = lessons;
+                    AppState.playlists = Array.from(playlists).sort();
+                    
+                    // Save to cache
+                    localStorage.setItem('epata_cached_lessons', newDataStr);
+
+                    // If we already rendered (cache was loaded), re-render silently
+                    if (isCachedLoaded) {
+                        UIRenderer.populateFilters();
+                        UIRenderer.populateDrawerCategories();
+                        ViewManager.renderCurrentView();
+                        UIRenderer.renderStats();
+                    }
                 }
-            });
+                return true;
+            } catch (error) {
+                console.error('Error loading fresh data:', error);
+                return false;
+            }
+        };
 
-            if (lessons.length === 0) return false;
-
-            AppState.lessons = lessons;
-            AppState.playlists = Array.from(playlists).sort();
+        // 3. Return immediately if cached, otherwise wait for fetch
+        if (isCachedLoaded) {
+            fetchFreshData(); // Run in background
             return true;
-        } catch (error) {
-            console.error('Error loading data:', error);
-            return false;
+        } else {
+            return await fetchFreshData();
         }
     },
 
@@ -703,7 +752,7 @@ const AppActions = {
         AppState.currentVideo = lesson;
         
         const modal = document.getElementById('videoModal');
-        const player = document.getElementById('videoPlayer');
+        const videoContainer = document.getElementById('videoContainer');
         const title = document.getElementById('videoTitle');
         const playlist = document.getElementById('videoPlaylist');
         const language = document.getElementById('videoLanguage');
@@ -711,7 +760,15 @@ const AppActions = {
         const markBtn = document.getElementById('markCompleteBtn');
         const favBtn = document.getElementById('addFavBtn');
         
-        player.src = `https://www.youtube.com/embed/${lesson.videoId}?autoplay=1&rel=0`;
+        // Dynamically create iframe to optimize performance
+        videoContainer.innerHTML = ''; // Clear any existing content
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.youtube.com/embed/${lesson.videoId}?autoplay=1&rel=0`;
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+        iframe.setAttribute('allowfullscreen', '');
+        videoContainer.appendChild(iframe);
+        
         title.textContent = lesson.title;
         playlist.innerHTML = `<i class="fas fa-list"></i> ${Utils.formatPlaylistName(lesson.playlist)}`;
         language.innerHTML = `<i class="fas fa-globe"></i> ${Utils.getLanguageDisplay(lesson.playlist)}`;
@@ -784,7 +841,11 @@ const AppActions = {
 
     closeVideoModal() {
         const modal = document.getElementById('videoModal');
-        document.getElementById('videoPlayer').src = '';
+        const videoContainer = document.getElementById('videoContainer');
+        
+        // Remove iframe from DOM to stop video and free memory
+        if (videoContainer) videoContainer.innerHTML = '';
+        
         modal.classList.remove('active');
         document.body.style.overflow = '';
         AppState.currentVideo = null;
