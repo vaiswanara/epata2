@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description" content="e-PATA - Learn Vedic Astrology through interactive YouTube lessons">
+    
+    <title>e-PATA - Vedic Astrology Learning</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons -->
+    <link rel="apple-touch-icon" href="logo.jpeg">
+    <link rel="icon" type="image/jpeg" href="logo.jpeg">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Noto+Sans+Kannada:wght@400;500;600&family=Noto+Sans+Telugu:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="logo-pulse">
+                <img src="logo.jpeg" alt="e-PATA" class="loading-logo">
+            </div>
+            <div class="loading-text">Loading Vedic Wisdom...</div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pull to Refresh Indicator -->
+    <div id="pullToRefresh" class="pull-to-refresh">
+        <div class="pull-spinner">
+            <i class="fas fa-sync-alt"></i>
+        </div>
+        <span>Pull to refresh</span>
+    </div>
+
+    <!-- Top Header (Mobile) -->
+    <header class="mobile-header" id="mobileHeader">
+        <button class="menu-btn" id="menuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="header-brand">
+            <img src="logo.jpeg" alt="e-PATA" class="header-logo">
+            <span class="header-title">e-PATA</span>
+        </div>
+        <button class="search-toggle" id="searchToggle">
+            <i class="fas fa-search"></i>
+        </button>
+    </header>
+
+    <!-- Search Bar (Expandable) -->
+    <div class="search-bar-container" id="searchBarContainer">
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search lessons, topics..." autocomplete="off">
+            <button class="search-clear" id="searchClear">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="search-filters">
+            <button class="filter-chip" id="filterKannada">
+                <i class="fas fa-language"></i> ಕನ್ನಡ
+            </button>
+            <button class="filter-chip" id="filterTelugu">
+                <i class="fas fa-language"></i> తెలుగు
+            </button>
+            <button class="filter-chip" id="filterFavorites">
+                <i class="fas fa-heart"></i> Favorites
+            </button>
+        </div>
+    </div>
+
+    <!-- Sidebar (Desktop & Tablet) -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="logo.jpeg" alt="e-PATA Logo" class="sidebar-logo">
+            <h2 class="sidebar-title">e-PATA</h2>
+            <p class="sidebar-subtitle">Vedic Astrology Learning</p>
+        </div>
+        
+        <div class="nav-section">
+            <h3 class="nav-section-title">Main Menu</h3>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-view="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li class="nav-item" data-view="courses">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>All Courses</span>
+                </li>
+                <li class="nav-item" data-view="favorites">
+                    <i class="fas fa-heart"></i>
+                    <span>Favorites</span>
+                    <span class="badge" id="favCount">0</span>
+                </li>
+                <li class="nav-item" data-view="progress">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Progress</span>
+                </li>
+                <li class="nav-item" data-view="recent">
+                    <i class="fas fa-clock"></i>
+                    <span>Recent</span>
+                </li>
+                <li class="nav-item nav-item-donate" data-view="donate">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <span>Donate</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="nav-section">
+            <h3 class="nav-section-title">Categories</h3>
+            <ul class="nav-menu" id="categoryMenu">
+                <!-- Dynamically populated -->
+            </ul>
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="https://vaiswanara.com" target="_blank" class="home-link">
+                <i class="fas fa-external-link-alt"></i>
+                <span>vaiswanara.com</span>
+            </a>
+            <button class="theme-toggle-desktop" id="themeToggleDesktop">
+                <i class="fas fa-moon"></i>
+                <span>Dark Mode</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Drawer Menu -->
+    <div class="mobile-drawer" id="mobileDrawer">
+        <div class="drawer-header">
+            <img src="logo.jpeg" alt="e-PATA" class="drawer-logo">
+            <div class="drawer-info">
+                <h3>e-PATA</h3>
+                <p>Vedic Astrology Learning</p>
+            </div>
+            <button class="drawer-close" id="drawerClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="drawer-content">
+            <div class="drawer-section">
+                <h4>Menu</h4>
+                <ul class="drawer-menu">
+                    <li class="drawer-item active" data-view="dashboard">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </li>
+                    <li class="drawer-item" data-view="courses">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>All Courses</span>
+                    </li>
+                    <li class="drawer-item" data-view="favorites">
+                        <i class="fas fa-heart"></i>
+                        <span>Favorites</span>
+                        <span class="drawer-badge" id="drawerFavCount">0</span>
+                    </li>
+                    <li class="drawer-item" data-view="progress">
+                        <i class="fas fa-chart-line"></i>
+                        <span>My Progress</span>
+                    </li>
+                    <li class="drawer-item" data-view="recent">
+                        <i class="fas fa-clock"></i>
+                        <span>Recently Watched</span>
+                    </li>
+                    <li class="drawer-item drawer-item-donate" data-view="donate">
+                        <i class="fas fa-hand-holding-heart"></i>
+                        <span>Donate</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="drawer-section">
+                <h4>Categories</h4>
+                <ul class="drawer-menu" id="drawerCategoryMenu">
+                    <!-- Dynamically populated -->
+                </ul>
+            </div>
+            <div class="drawer-footer">
+                <a href="https://vaiswanara.com" target="_blank" class="drawer-link">
+                    <i class="fas fa-external-link-alt"></i>
+                    Visit vaiswanara.com
+                </a>
+                <button class="drawer-theme-toggle" id="themeToggleMobile">
+                    <i class="fas fa-moon"></i>
+                    <span>Dark Mode</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Drawer Overlay -->
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Desktop Header -->
+        <header class="desktop-header">
+            <div class="header-left">
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                <p class="page-subtitle">Welcome to your Vedic Astrology learning journey</p>
+            </div>
+            <div class="header-right">
+                <div class="desktop-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="desktopSearchInput" placeholder="Search lessons...">
+                </div>
+                <button class="theme-btn" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard View -->
+        <div class="view" id="dashboardView">
+            <!-- Welcome Banner -->
+            <div class="welcome-banner" id="welcomeBanner">
+                <div class="welcome-content">
+                    <h2>🙏 Namaste!</h2>
+                    <p>Continue your Vedic Astrology journey</p>
+                </div>
+                <div class="welcome-stats">
+                    <div class="welcome-stat">
+                        <span class="stat-value" id="welcomeProgress">0%</span>
+                        <span class="stat-label">Complete</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="quick-action-btn" data-action="continue">
+                    <div class="quick-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <span>Continue</span>
+                </button>
+                <button class="quick-action-btn" data-action="favorites">
+                    <div class="quick-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <span>Favorites</span>
+                </button>
+                <button class="quick-action-btn" data-action="progress">
+                    <div class="quick-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <span>Progress</span>
+                </button>
+                <button class="quick-action-btn" data-action="all">
+                    <div class="quick-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <i class="fas fa-th-large"></i>
+                    </div>
+                    <span>All</span>
+                </button>
+            </div>
+
+            <!-- Continue Learning (Mobile Card) -->
+            <div class="section" id="continueSection" style="display: none;">
+                <div class="section-header">
+                    <h2><i class="fas fa-play-circle"></i> Continue Learning</h2>
+                </div>
+                <div class="continue-card" id="continueCard">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalLessons">0</h3>
+                        <p>Lessons</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon pink">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalPlaylists">0</h3>
+                        <p>Courses</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="completedLessons">0</h3>
+                        <p>Done</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="progressPercent">0%</h3>
+                        <p>Progress</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Playlists -->
+            <section class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-star"></i> Featured Courses</h2>
+                    <button class="see-all-btn" data-view="courses">See All <i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="playlist-scroll" id="featuredPlaylists">
+                    <!-- Horizontally scrollable -->
+                </div>
+            </section>
+
+            <!-- Recent Lessons -->
+            <section class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-history"></i> Recent</h2>
+                </div>
+                <div class="lesson-scroll" id="recentLessons">
+                    <!-- Horizontally scrollable cards -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Courses View -->
+        <div class="view hidden" id="coursesView">
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <select id="playlistFilter">
+                        <option value="">All Courses</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <select id="languageFilter">
+                        <option value="">All Languages</option>
+                        <option value="kannada">ಕನ್ನಡ (Kannada)</option>
+                        <option value="telugu">తెలుగు (Telugu)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Results Count -->
+            <div class="results-count" id="resultsCount"></div>
+            
+            <div class="lessons-container grid-view" id="lessonsContainer">
+                <!-- Dynamically populated -->
+            </div>
+            
+            <!-- Load More Button -->
+            <div class="load-more-container" id="loadMoreContainer" style="display: none;">
+                <button class="load-more-btn" id="loadMoreBtn">
+                    <i class="fas fa-chevron-down"></i> Load More
+                </button>
+            </div>
+        </div>
+
+        <!-- Favorites View -->
+        <div class="view hidden" id="favoritesView">
+            <div class="empty-state" id="favEmptyState">
+                <div class="empty-icon">
+                    <i class="fas fa-heart-broken"></i>
+                </div>
+                <h3>No Favorites Yet</h3>
+                <p>Tap the heart icon on any lesson to save it here</p>
+                <button class="empty-action-btn" data-view="courses">Browse Courses</button>
+            </div>
+            <div class="lessons-container grid-view" id="favoritesContainer">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <!-- Progress View -->
+        <div class="view hidden" id="progressView">
+            <div class="progress-header">
+                <div class="progress-circle-container">
+                    <div class="progress-circle">
+                        <svg viewBox="0 0 100 100">
+                            <defs>
+                                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#667eea"/>
+                                    <stop offset="100%" style="stop-color:#764ba2"/>
+                                </linearGradient>
+                            </defs>
+                            <circle class="progress-bg" cx="50" cy="50" r="42"></circle>
+                            <circle class="progress-bar" id="progressCircle" cx="50" cy="50" r="42"></circle>
+                        </svg>
+                        <div class="progress-text">
+                            <span id="progressText">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-summary">
+                    <h3>Your Progress</h3>
+                    <p><strong id="progressCompleted">0</strong> of <strong id="progressTotal">0</strong> lessons completed</p>
+                </div>
+            </div>
+            
+            <div class="progress-courses" id="progressByPlaylist">
+                <!-- Progress by course -->
+            </div>
+        </div>
+
+        <!-- Recent View -->
+        <div class="view hidden" id="recentView">
+            <div class="empty-state" id="recentEmptyState">
+                <div class="empty-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>No Recently Watched</h3>
+                <p>Start watching lessons to see them here</p>
+                <button class="empty-action-btn" data-view="courses">Start Learning</button>
+            </div>
+            <div class="lessons-container grid-view" id="recentContainer">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <!-- Donate View -->
+        <div class="view hidden" id="donateView">
+            <div class="donate-header">
+                <div class="donate-icon">
+                    <i class="fas fa-hand-holding-heart"></i>
+                </div>
+                <h2>Support Our Mission</h2>
+                <p>Your contribution helps keep Vedic Astrology education free for everyone</p>
+            </div>
+            
+            <div class="donate-content">
+                <div class="donate-message">
+                    <p>I am dedicated to sharing the authentic knowledge of Vedic Astrology with anyone eager to learn, <strong>without seeking any monetary gain</strong>. My mission is to make this ancient wisdom accessible to all, enabling students to understand life better, protect themselves from false astrologers, and live with peace and harmony.</p>
+                    
+                    <p>While this course and all future classes are <strong>completely free of charge</strong>, I humbly invite those who wish to support this initiative to consider making a donation. Your contributions will help me meet essential living expenses such as groceries, utilities, and internet services, ensuring that this program continues to serve the community.</p>
+                </div>
+                
+                <div class="donate-benefits">
+                    <h3><i class="fas fa-heart"></i> How Your Donation Helps</h3>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> Supports the ongoing creation and maintenance of educational content</li>
+                        <li><i class="fas fa-check-circle"></i> Helps cover the costs of House Maintenance and internet</li>
+                        <li><i class="fas fa-check-circle"></i> Enables me to continue offering this knowledge freely</li>
+                    </ul>
+                </div>
+                
+                <div class="donate-note">
+                    <i class="fas fa-info-circle"></i>
+                    <p>I want to make it clear that students are <strong>not required</strong> to subscribe, like, or share my YouTube videos or page. However, I would be truly happy if you share the knowledge you gain with others, as that will help spread the essence of this course and its teachings.</p>
+                </div>
+                
+                <div class="donate-thanks">
+                    <p>Your generous support, no matter the amount, plays a crucial role in keeping this program available to all who seek to learn.</p>
+                    <p class="thank-you-text">🙏 Thank You 🙏</p>
+                </div>
+                
+                <div class="donate-author">
+                    <p>With Gratitude,</p>
+                    <h4>Srikanth Dharmavaram (Vaiswanara)</h4>
+                    <span>Vedic Astrology Trainer & Guide</span>
+                </div>
+                
+                <div class="donate-image-container">
+                    <img src="donate.png" alt="Donation Details - Bank and UPI" class="donate-image">
+                </div>
+                
+                <div class="donate-actions">
+                    <button class="donate-upi-btn" id="copyUpiBtn">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>Copy UPI Number</span>
+                    </button>
+                    <a href="https://vaiswanara.com" target="_blank" class="donate-website-btn">
+                        <i class="fas fa-globe"></i>
+                        <span>Visit vaiswanara.com</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="bottom-nav" id="bottomNav">
+        <button class="bottom-nav-item active" data-view="dashboard">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </button>
+        <button class="bottom-nav-item" data-view="courses">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Courses</span>
+        </button>
+        <button class="bottom-nav-item" data-view="favorites">
+            <i class="fas fa-heart"></i>
+            <span>Saved</span>
+        </button>
+        <button class="bottom-nav-item" data-view="progress">
+            <i class="fas fa-chart-line"></i>
+            <span>Progress</span>
+        </button>
+    </nav>
+
+    <!-- Floating Action Button -->
+    <button class="fab" id="fab" title="Continue Learning">
+        <i class="fas fa-play"></i>
+    </button>
+
+    <!-- Video Player Modal -->
+    <div class="modal" id="videoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="modal-back" id="modalBack">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h3 id="videoTitle">Video Title</h3>
+                <button class="modal-close" id="closeVideoModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="video-container">
+                <iframe id="videoPlayer" src="" frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen></iframe>
+            </div>
+            <div class="video-info">
+                <div class="video-meta">
+                    <span id="videoPlaylist"><i class="fas fa-list"></i> Playlist</span>
+                    <span id="videoLanguage"><i class="fas fa-globe"></i> Language</span>
+                </div>
+            </div>
+            <div class="video-actions">
+                <button class="video-action-btn" id="markCompleteBtn">
+                    <i class="fas fa-check"></i>
+                    <span>Complete</span>
+                </button>
+                <button class="video-action-btn" id="addFavBtn">
+                    <i class="far fa-heart"></i>
+                    <span>Save</span>
+                </button>
+                <a href="#" class="video-action-btn" id="pdfLink" target="_blank" style="display: none;">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>Notes</span>
+                </a>
+                <button class="video-action-btn" id="shareBtn">
+                    <i class="fas fa-share-alt"></i>
+                    <span>Share</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal share-modal" id="shareModal">
+        <div class="modal-content share-content">
+            <div class="modal-header">
+                <h3>Share Lesson</h3>
+                <button class="modal-close" id="closeShareModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="share-options">
+                <button class="share-option" data-share="whatsapp">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>WhatsApp</span>
+                </button>
+                <button class="share-option" data-share="telegram">
+                    <i class="fab fa-telegram"></i>
+                    <span>Telegram</span>
+                </button>
+                <button class="share-option" data-share="copy">
+                    <i class="fas fa-link"></i>
+                    <span>Copy Link</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Action completed!</span>
+    </div>
+
+    <!-- Offline Indicator -->
+    <div class="offline-indicator" id="offlineIndicator">
+        <i class="fas fa-wifi-slash"></i>
+        <span>You're offline</span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
