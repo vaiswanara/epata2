@@ -367,8 +367,4 @@ MANA:SHASTRA(ಕನ್ನಡ),106: DIVINE VIBHUTIS EXPLAINED(ಶಂಕರ-ಬೃ
 JYOTISHA(ಕನ್ನಡ)-2025,43: Practicing Kalatra Sthaana,OmNN9_D7tnU, none
 JYOTISHA(తెలుగు)-2025,43: Practicing Kalatra Sthaana,yVLp0caXV5A, none
 
-MANA:SHASTRA(ಕನ್ನಡ),107: DIVINE VIBHUTIS EXPLAINED(ಅಶ್ವತ್ಥಃ-ನಾರದ-ಚಿತ್ರರಥಂ-ಕಪಿಲ-ವಜ್ರಃ…),IK5O8A1xQec,none 
-JYOTISHA(ಕನ್ನಡ)-2025,44: Analyzing 2nd House(Family),drRsYW1Foj0,https://drive.google.com/file/d/18vacyS17y4xIAMSqcJnezOzDKam_l45Y/view?usp=sharing
-JYOTISHA(తెలుగు)-2025,44: Analyzing 2nd House(Family), none,none
-
 

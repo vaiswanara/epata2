@@ -126,34 +126,64 @@ const Utils = {
 // ============================================
 const DataManager = {
     async loadData() {
+        const localUrl = 'links.txt';
+        const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RStlHwy-jhwrGCg7JUrE8I3MZxukUqBGqdUxGywRof4WyItHEJZ0FP93GeB_ktBAXte3avGhYEVw/pub?gid=0&single=true&output=csv';
+        
+        // Append timestamp to prevent caching
+        const sheetUrlWithCache = googleSheetUrl + '&t=' + new Date().getTime();
+
         try {
-            const response = await fetch('links.txt');
-            const text = await response.text();
-            
-            const rows = text.trim().split('\n').slice(1);
+            // Fetch both sources in parallel
+            const results = await Promise.allSettled([
+                fetch(localUrl).then(res => {
+                    if (!res.ok) throw new Error('Failed to load local file');
+                    return res.text();
+                }),
+                fetch(sheetUrlWithCache).then(res => {
+                    if (!res.ok) throw new Error('Failed to load Google Sheet');
+                    return res.text();
+                })
+            ]);
+
             const lessons = [];
             const playlists = new Set();
+            let globalIndex = 0;
             
-            rows.forEach((row, index) => {
-                const parts = row.split(',').map(f => f.trim());
-                if (parts.length >= 3) {
-                    const [playlist, title, videoId, pdfLink] = parts;
-                    if (playlist && title) {
-                        playlists.add(playlist);
-                        lessons.push({
-                            id: `lesson_${index}`,
-                            playlist,
-                            title,
-                            videoId: videoId?.length === 11 ? videoId : null,
-                            pdfLink: pdfLink && pdfLink !== 'none' ? pdfLink : null,
-                            language: Utils.getLanguage(playlist),
-                            thumbnail: videoId?.length === 11 ? Utils.getYouTubeThumbnail(videoId) : null,
-                            hasNotes: pdfLink && pdfLink !== 'none'
-                        });
+            const processCSV = (text) => {
+                const rows = text.trim().split('\n');
+                // Skip header row
+                rows.slice(1).forEach(row => {
+                    const parts = row.split(',').map(f => f.trim());
+                    if (parts.length >= 3) {
+                        const [playlist, title, videoId, pdfLink] = parts;
+                        if (playlist && title) {
+                            playlists.add(playlist);
+                            lessons.push({
+                                id: `lesson_${globalIndex++}`,
+                                playlist,
+                                title,
+                                videoId: videoId?.length === 11 ? videoId : null,
+                                pdfLink: pdfLink && pdfLink !== 'none' ? pdfLink : null,
+                                language: Utils.getLanguage(playlist),
+                                thumbnail: videoId?.length === 11 ? Utils.getYouTubeThumbnail(videoId) : null,
+                                hasNotes: pdfLink && pdfLink !== 'none'
+                            });
+                        }
                     }
+                });
+            };
+            
+            // Process results from both sources
+            results.forEach((result, index) => {
+                if (result.status === 'fulfilled') {
+                    processCSV(result.value);
+                } else {
+                    console.warn(`Source ${index === 0 ? 'Local' : 'Google Sheets'} failed:`, result.reason);
                 }
             });
-            
+
+            if (lessons.length === 0) return false;
+
             AppState.lessons = lessons;
             AppState.playlists = Array.from(playlists).sort();
             return true;
