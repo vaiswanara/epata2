@@ -192,7 +192,6 @@ MANA:SHASTRA(ಕನ್ನಡ),103: The Glory of the Lord — Path of Knowledge &
 MANA:SHASTRA(ಕನ್ನಡ),104: Arujuna requests Krishna to explain "Vibhuthi"(ಭಗವಂತನ ವಿಭೂತಿ ಜ್ಞಾನಕ್ಕಾಗಿ ವಿನಂತಿ),dsuKJ9ch-mw, none
 MANA:SHASTRA(ಕನ್ನಡ),105: DIVINE VIBHUTIS EXPLAINED(ವಿಷ್ಣು–ರವಿ–ಮರೀಚಿ–ಶಶಿ ವಿಭೂತಿ), hb9HznxKJSg, none
 MANA:SHASTRA(ಕನ್ನಡ),106: DIVINE VIBHUTIS EXPLAINED(ಶಂಕರ-ಬೃಹಸ್ಪತಿ-ಸ್ಕಂದ-ಹಿಮಾಲಯ…),YRGItVVIbCI, none
-
 MANA:SHASTRAMU(తెలుగు),01: Concept of Moksha,HfzSIyf-gIQ, none
 MANA:SHASTRAMU(తెలుగు),02:Athma - 15 Fences (ఆత్మ-15 కంచలు), ptIo3vUXx50, none
 MANA:SHASTRAMU(తెలుగు),03:Concept of Moksha in Different Religions, E8DmXG3q3T0, none
